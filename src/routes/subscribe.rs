@@ -3,8 +3,6 @@ use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-// FIXME: Remove the `#[allow(dead_code)]` later and add a fix
-#[allow(dead_code)]
 #[derive(serde::Deserialize)]
 pub struct FormData {
     email: String,
@@ -12,6 +10,18 @@ pub struct FormData {
 }
 
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
+    let request_id = Uuid::new_v4();
+
+    log::info!(
+        "[Req ID: {}] - Attempting adding '{}' '{}' as a new subscriber",
+        request_id,
+        form.email,
+        form.name
+    );
+    log::info!(
+        "[Req ID: {}] - Attempting saving new subscriber details to the database",
+        request_id
+    );
     match sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
@@ -25,9 +35,19 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
     .execute(pool.get_ref())
     .await
     {
-        Ok(_) => HttpResponse::Ok().finish(),
-        Err(e) => {
-            println!("Failed to execute query: {}", e);
+        Ok(_) => {
+            log::info!(
+                "[Req ID: {}] - New subscriber details saved to the database successfully",
+                request_id
+            );
+            HttpResponse::Ok().finish()
+        }
+        Err(error) => {
+            log::error!(
+                "[Req ID: {}] - Failed to execute query: {:?}",
+                request_id,
+                error
+            );
             HttpResponse::InternalServerError().finish()
         }
     };

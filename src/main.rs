@@ -1,3 +1,4 @@
+use env_logger::Env;
 use sqlx::PgPool;
 use std::net::TcpListener;
 use velo::configuration::get_configuration;
@@ -5,6 +6,8 @@ use velo::startup::run;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+
     let configuration = get_configuration().expect("Failed to read configuration");
 
     let connection = PgPool::connect(&configuration.database.connection_string())
