@@ -10,7 +10,7 @@ path = "src/lib.rs"
 actix-web = "4"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 serde = { version = "1", features = ["derive"] }
-config = "0.15.19"
+config = { version = "0.15.19", default-features = false, features = ["yaml"] }
 uuid = { version = "1.18.1", default-features = false, features = ["v4"] }
 chrono = { version = "0.4.42", features = ["clock"] }
 
