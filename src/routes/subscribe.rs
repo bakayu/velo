@@ -1,15 +1,23 @@
+//! # Subscribe Route
+//!
+//! Handles user subscriptions to the newsletter.
+
 use actix_web::{HttpResponse, web};
 use chrono::Utc;
 use sqlx::PgPool;
 use tracing::Instrument;
 use uuid::Uuid;
 
+/// Form data for the subscription endpoint.
 #[derive(serde::Deserialize)]
 pub struct FormData {
     email: String,
     name: String,
 }
 
+/// Handler for the `POST /subscribe` endpoint.
+///
+/// Adds a new subscriber to the database using the provided form data.
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
     let request_id = Uuid::new_v4();
 

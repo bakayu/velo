@@ -1,3 +1,7 @@
+//! # Startup
+//!
+//! Contains logic to bootstrap the application server.
+
 use crate::routes::{health_check, subscribe};
 use actix_web::dev::Server;
 use actix_web::middleware::Logger;
@@ -5,6 +9,7 @@ use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
 use std::net::TcpListener;
 
+/// Initializes the HTTP server with the given listener and database pool.
 pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Error> {
     let db_pool = web::Data::new(db_pool);
     let server = HttpServer::new(move || {

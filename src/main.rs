@@ -1,3 +1,8 @@
+//! # Velo Binary
+//!
+//! The entry point for the Velo application. It initializes the environment,
+//! connects to the database, and starts the HTTP server.
+
 use sqlx::PgPool;
 use std::net::TcpListener;
 use velo::configuration::get_configuration;
@@ -6,7 +11,7 @@ use velo::telemetry::{get_subscriber, init_subscriber};
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
-    let subscriber = get_subscriber("velo".into(), "info".into());
+    let subscriber = get_subscriber("velo".into(), "info".into(), std::io::stdout);
     init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to read configuration");
