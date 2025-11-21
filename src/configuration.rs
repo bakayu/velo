@@ -1,35 +1,55 @@
-#[derive(serde::Deserialize)]
+//! # Configuration
+//!
+//! Handles reading and parsing application configuration from files.
+
+use config::ConfigError;
+use secrecy::{ExposeSecret, SecretString};
+use serde::Deserialize;
+
+/// Application-level settings.
+#[derive(Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application_port: u16,
 }
 
-#[derive(serde::Deserialize)]
+/// Database connection settings.
+#[derive(Deserialize)]
 pub struct DatabaseSettings {
     pub username: String,
-    pub password: String,
+    pub password: SecretString,
     pub port: u16,
     pub host: String,
     pub database_name: String,
 }
 
 impl DatabaseSettings {
-    pub fn connection_string(&self) -> String {
-        format!(
+    /// Generates a connection string for the Postgres database.
+    pub fn connection_string(&self) -> SecretString {
+        SecretString::from(format!(
             "postgres://{}:{}@{}:{}/{}",
-            self.username, self.password, self.host, self.port, self.database_name
-        )
+            self.username,
+            self.password.expose_secret(),
+            self.host,
+            self.port,
+            self.database_name
+        ))
     }
 
-    pub fn connection_string_without_db(&self) -> String {
-        format!(
+    /// Generates a connection string to the Postgres instance (without specifying a DB).
+    pub fn connection_string_without_db(&self) -> SecretString {
+        SecretString::from(format!(
             "postgres://{}:{}@{}:{}",
-            self.username, self.password, self.host, self.port
-        )
+            self.username,
+            self.password.expose_secret(),
+            self.host,
+            self.port
+        ))
     }
 }
 
-pub fn get_configuration() -> Result<Settings, config::ConfigError> {
+/// Reads configuration from `config.yaml`.
+pub fn get_configuration() -> Result<Settings, ConfigError> {
     // Initialize configuration reader
     let settings = config::Config::builder()
         .add_source(config::File::new("config.yaml", config::FileFormat::Yaml))
