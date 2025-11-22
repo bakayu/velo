@@ -3,5 +3,4 @@ target/
 tests/
 Dockerfile
 scripts/
-migrations/
 .cargo/
