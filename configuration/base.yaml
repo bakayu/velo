@@ -1,9 +1,10 @@
-# config.yaml
+# base.yaml
 
-application_port: 8000
 database:
   username: "postgres"
   password: "password"
   host: "localhost"
   port: 5432
   database_name: "velo"
+application:
+  port: 8000
