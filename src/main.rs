@@ -3,7 +3,7 @@
 //! The entry point for the Velo application. It initializes the environment,
 //! connects to the database, and starts the HTTP server.
 
-use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
 use velo::configuration::get_configuration;
 use velo::startup::run;
@@ -16,12 +16,19 @@ async fn main() -> Result<(), std::io::Error> {
 
     let configuration = get_configuration().expect("Failed to read configuration");
 
-    let connection = PgPool::connect_lazy_with(configuration.database.connect_options());
+    let connection_pool = PgPoolOptions::new()
+        .acquire_timeout(std::time::Duration::from_secs(2))
+        .connect_lazy_with(configuration.database.connect_options());
+
+    sqlx::migrate!("./migrations")
+        .run(&connection_pool)
+        .await
+        .expect("Failed to migrate the database");
 
     let address = format!(
         "{}:{}",
         configuration.application.host, configuration.application.port
     );
     let listener = TcpListener::bind(address)?;
-    run(listener, connection)?.await
+    run(listener, connection_pool)?.await
 }
