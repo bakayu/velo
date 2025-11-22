@@ -11,31 +11,31 @@ env:
 
 jobs:
   # Create a GitHub Release with a pretty changelog first
-  create-release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Required for git-cliff to read history
+#   create-release:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0 # Required for git-cliff to read history
 
-      - name: Generate Changelog
-        uses: orhun/git-cliff-action@v3
-        id: git-cliff
-        with:
-          config: cliff.toml
-          args: -vv --latest --strip header
-        env:
-          OUTPUT: CHANGELOG.md
+#       - name: Generate Changelog
+#         uses: orhun/git-cliff-action@v3
+#         id: git-cliff
+#         with:
+#           config: cliff.toml
+#           args: -vv --latest --strip header
+#         env:
+#           OUTPUT: CHANGELOG.md
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body: ${{ steps.git-cliff.outputs.content }}
-          prerelease: false
+#       - name: Create GitHub Release
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           body: ${{ steps.git-cliff.outputs.content }}
+#           prerelease: false
 
   # The Deployment Job (same as before, but waits for release creation)
   build-and-deploy:
-    needs: create-release
+    # needs: create-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
