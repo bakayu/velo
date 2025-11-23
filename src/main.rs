@@ -1,7 +1,6 @@
 //! # Velo Binary
 //!
-//! The entry point for the Velo application. It initializes the environment,
-//! connects to the database, and starts the HTTP server.
+//! The entry point for the Velo application.
 
 use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;

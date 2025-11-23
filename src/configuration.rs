@@ -1,6 +1,11 @@
 //! # Configuration
 //!
-//! Handles reading and parsing application configuration from files.
+//! Handles reading and parsing application configuration from files and environment variables.
+//!
+//! The configuration is hierarchical:
+//! 1. `base.yaml`: Common settings.
+//! 2. `local.yaml` or `production.yaml`: Environment-specific overrides.
+//! 3. Environment variables (prefixed with `APP_`): Runtime overrides.
 
 use config::ConfigError;
 use secrecy::{ExposeSecret, SecretString};
@@ -16,6 +21,8 @@ pub struct Settings {
 }
 
 /// Database connection settings.
+///
+/// Holds all necessary information to establish a connection to the PostgreSQL database.
 #[derive(Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub username: String,
@@ -27,6 +34,7 @@ pub struct DatabaseSettings {
     pub require_ssl: bool,
 }
 
+/// Settings for the HTTP server binding.
 #[derive(Deserialize)]
 pub struct ApplicationSettings {
     #[serde(deserialize_with = "deserialize_number_from_string")]
@@ -35,12 +43,14 @@ pub struct ApplicationSettings {
 }
 
 impl DatabaseSettings {
-    /// Returns `PgConnectOptions` configured with the database name.
+    /// Returns `PgConnectOptions` configured with the database name and SSL mode.
+    ///
+    /// If `require_ssl` is true, it enforces an encrypted connection.
+    /// Otherwise, it prefers encryption but falls back to cleartext.
     pub fn connect_options(&self) -> PgConnectOptions {
         let ssl_mode = if self.require_ssl {
             PgSslMode::Require
         } else {
-            // Try an encrypted connection, fallback to unencrypted if it fails
             PgSslMode::Prefer
         };
         PgConnectOptions::new()
@@ -53,7 +63,9 @@ impl DatabaseSettings {
     }
 }
 
-/// Reads configuration from `config.yaml`.
+/// Reads configuration from `config.yaml` and environment variables.
+///
+/// Detects the running environment via the `APP_ENVIRONMENT` variable (defaults to `local`).
 pub fn get_configuration() -> Result<Settings, ConfigError> {
     let base_path = std::env::current_dir().expect("Failed to determine the current directory");
     let configuration_dir = base_path.join("configuration");
