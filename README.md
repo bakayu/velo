@@ -77,7 +77,7 @@ cargo deny check advisories
 cargo watch -x 'clippy --all-features --all-targets -- -D warnings' -x test -x run | bunyan
 ```
 
-> [!INFO]
+> [!TIP]
 > `bunyan` is used to prettify the telemetry logs, you can install it via `npm` or `cargo install bunyan`.
 
 ## Configuration
