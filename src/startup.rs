@@ -12,6 +12,7 @@ use tracing_actix_web::TracingLogger;
 /// Initializes the HTTP server with the given listener and database pool.
 pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Error> {
     let db_pool = web::Data::new(db_pool);
+    let local_addr = listener.local_addr()?;
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
@@ -23,7 +24,7 @@ pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Er
     .run();
 
     println!("\n{}", "=".repeat(60));
-    println!("\n\tServer running at : http://127.0.0.1:8000\n");
+    println!("\n\tServer running at : {}\n", local_addr);
     println!("{}\n", "=".repeat(60));
 
     Ok(server)
