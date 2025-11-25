@@ -1,5 +1,7 @@
 # Velo
 
+![CI Pipeline](https://github.com/bakayu/velo/actions/workflows/CI.yml/badge.svg) ![Deploy Pipeline](https://github.com/bakayu/velo/actions/workflows/deploy.yml/badge.svg) [![codecov](https://codecov.io/gh/bakayu/velo/graph/badge.svg)](https://codecov.io/gh/bakayu/velo) ![Latest Release](https://img.shields.io/github/v/release/bakayu/velo?include_prereleases) ![Rust Version](https://img.shields.io/badge/rust-1.91.1%2B-orange.svg)
+
 A newsletter subscription service built with Rust and actix-web
 
 ## Prerequisites
