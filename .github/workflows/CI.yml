@@ -15,8 +15,8 @@ env:
   APP_DB_NAME: velo
 
 jobs:
-  test:
-    name: Test
+  test_and_coverage:
+    name: Test and Code Coverage
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -60,6 +60,21 @@ jobs:
 
       - name: Check that queries are fresh
         run: cargo sqlx prepare --workspace --check -- --all-targets
+
+      - name: Install tarpaulin
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-tarpaulin
+
+      - name: Generate code coverage
+        run: cargo tarpaulin --verbose --workspace --out xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./cobertura.xml
+          fail_ci_if_error: true
 
   fmt:
     name: Rustfmt
