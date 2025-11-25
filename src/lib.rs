@@ -6,12 +6,14 @@
 //!
 //! - [`configuration`]: Handles reading and parsing application configuration from files and environment variables.
 //! - [`domain`]: Contains the business logic and type definitions (e.g., `SubscriberEmail`, `SubscriberName`) that enforce domain invariants.
+//! - [`email_client`]: TODO: Add documentation
 //! - [`routes`]: Defines the HTTP route handlers for the application endpoints.
 //! - [`startup`]: Contains logic to bootstrap the application server and database connection.
 //! - [`telemetry`]: Provides infrastructure for structured logging and distributed tracing.
 
 pub mod configuration;
 pub mod domain;
+pub mod email_client;
 pub mod routes;
 pub mod startup;
 pub mod telemetry;
