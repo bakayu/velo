@@ -15,8 +15,8 @@ env:
   APP_DB_NAME: velo
 
 jobs:
-  test_and_coverage:
-    name: Test and Code Coverage
+  test:
+    name: Test
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -60,6 +60,46 @@ jobs:
 
       - name: Check that queries are fresh
         run: cargo sqlx prepare --workspace --check -- --all-targets
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install the Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Install sqlx-cli
+        run: cargo install sqlx-cli 
+            --version ${{ env.SQLX_VERSION }} 
+            --no-default-features 
+            --features ${{ env.SQLX_FEATURES }} 
+            --locked
+      - name: Create app user in Postgres
+        run: |
+          sudo apt-get install postgresql-client
+
+          # Create app user
+          CREATE_QUERY="CREATE USER ${APP_USER} WITH PASSWORD '${APP_USER_PWD}';"
+          PGPASSWORD="password" psql -U "postgres" -h "localhost" -c "${CREATE_QUERY}"
+
+          # Grant create db privileges to the app user
+          GRANT_QUERY="ALTER USER ${APP_USER} CREATEDB;"
+          PGPASSWORD="password" psql -U "postgres" -h "localhost" -c "${GRANT_QUERY}"
+
+      - name: Migrate database
+        run: SKIP_DOCKER=true ./scripts/init_db.sh
 
       - name: Install tarpaulin
         uses: taiki-e/install-action@v2
