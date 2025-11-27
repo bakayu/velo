@@ -3,6 +3,9 @@ use reqwest::{Client, Url};
 use secrecy::{ExposeSecret, SecretString};
 use serde::Serialize;
 
+/// A client for sending emails using an HTTP API (e.g., Postmark).
+///
+/// It handles the HTTP connection, authentication, and request formatting.
 pub struct EmailClient {
     http_client: Client,
     base_url: Url,
@@ -11,6 +14,7 @@ pub struct EmailClient {
 }
 
 impl EmailClient {
+    /// Creates a new instance of `EmailClient`.
     pub fn new(
         base_url: String,
         sender: SubscriberEmail,
@@ -28,6 +32,7 @@ impl EmailClient {
         }
     }
 
+    /// Sends an email to a specific subscriber.
     pub async fn send_email(
         &self,
         recipient: SubscriberEmail,
