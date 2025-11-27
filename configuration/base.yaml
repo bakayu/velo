@@ -8,3 +8,8 @@ database:
   database_name: "velo"
 application:
   port: 8000
+email_client:
+  base_url: "http://localhost"
+  sender_email: "test@mail.com"
+  auth_token: "secret-api-key"
+  timeout_milliseconds: 10000
